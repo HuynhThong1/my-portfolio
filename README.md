@@ -1,36 +1,112 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Professional Portfolio Builder
 
-## Getting Started
+A modern, database-driven portfolio builder built with Next.js 16, featuring authentication, full customization capabilities, and Docker deployment.
 
-First, run the development server:
+## Features
+
+✅ **Completed:**
+- Next.js 16 with App Router and Server Components
+- TypeScript for type safety
+- Tailwind CSS v4 + shadcn/ui components
+- PostgreSQL database with Prisma ORM
+- NextAuth.js v5 authentication with role-based access control
+- Database-backed content management
+- Reusable block components (Hero, About, Skills, Projects, Experience, Contact)
+- SEO optimization utilities
+- Docker deployment configuration
+- Database seeding with sample data
+- Framer Motion animations
+
+🚧 **To-Do:**
+- Drag-and-drop admin builder interface
+- Full admin panel with CRUD operations
+- Additional portfolio pages
+- Image upload functionality
+- Contact form API endpoint
+
+## Prerequisites
+
+- Node.js 20+ with pnpm
+- PostgreSQL 16+
+- Docker & Docker Compose (optional)
+
+## Quick Start
+
+### 1. Install Dependencies
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Set Up Environment
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+cp .env.example .env
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Update `.env` with your database credentials.
 
-## Learn More
+### 3. Set Up Database
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+# Run migrations
+pnpm prisma migrate dev --name init
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Seed database with sample data
+pnpm prisma db seed
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 4. Run Development Server
 
-## Deploy on Vercel
+```bash
+pnpm dev
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Visit:
+- Portfolio: [http://localhost:3000](http://localhost:3000)
+- Admin: [http://localhost:3000/admin/login](http://localhost:3000/admin/login)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**Default Admin Login:**
+- Email: admin@example.com
+- Password: admin123
+
+## Docker Deployment
+
+```bash
+# Start with Docker Compose
+docker-compose up -d
+
+# View logs
+docker-compose logs -f portfolio
+```
+
+## Tech Stack
+
+- **Framework:** Next.js 16
+- **Database:** PostgreSQL + Prisma
+- **Auth:** NextAuth.js v5
+- **UI:** Tailwind CSS v4 + shadcn/ui
+- **Animations:** Framer Motion
+- **Package Manager:** pnpm
+
+## Development
+
+```bash
+pnpm dev          # Development server
+pnpm build        # Production build
+pnpm start        # Production server
+pnpm lint         # Lint code
+```
+
+## Database Commands
+
+```bash
+pnpm prisma migrate dev      # Create migration
+pnpm prisma generate         # Generate Prisma client
+pnpm prisma db seed          # Seed database
+pnpm prisma studio           # Open Prisma Studio
+```
+
+## License
+
+MIT
