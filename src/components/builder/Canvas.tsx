@@ -55,7 +55,14 @@ export function Canvas({
       const oldIndex = sections.findIndex((s) => s.id === active.id);
       const newIndex = sections.findIndex((s) => s.id === over.id);
 
-      const newSections = arrayMove(sections, oldIndex, newIndex);
+      const reorderedSections = arrayMove(sections, oldIndex, newIndex);
+
+      // Update order field to match new array positions
+      const newSections = reorderedSections.map((section, index) => ({
+        ...section,
+        order: index,
+      }));
+
       onSectionsChange(newSections);
     }
 
@@ -113,7 +120,13 @@ export function Canvas({
                   isSelected={selectedSection?.id === section.id}
                   onSelect={() => onSelectSection(section)}
                   onDelete={() => {
-                    onSectionsChange(sections.filter((s) => s.id !== section.id));
+                    const filteredSections = sections.filter((s) => s.id !== section.id);
+                    // Update order field after deletion
+                    const reorderedSections = filteredSections.map((s, index) => ({
+                      ...s,
+                      order: index,
+                    }));
+                    onSectionsChange(reorderedSections);
                     if (selectedSection?.id === section.id) {
                       onSelectSection(null);
                     }

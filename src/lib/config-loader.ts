@@ -61,6 +61,7 @@ export const getConfig = cache(async (): Promise<PortfolioConfig> => {
     acc[skill.category].push({
       name: skill.name,
       icon: skill.icon,
+      imageUrl: skill.imageUrl,
       proficiency: skill.proficiency,
     });
     return acc;

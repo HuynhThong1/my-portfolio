@@ -4,44 +4,46 @@ import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 
-const skillSchema = z.object({
-  name: z.string().min(1).optional(),
-  icon: z.string().optional(),
-  imageUrl: z.string().optional(),
-  category: z.string().min(1).optional(),
-  proficiency: z.number().min(0).max(100).optional(),
+const educationSchema = z.object({
+  institution: z.string().min(1).optional(),
+  degree: z.string().min(1).optional(),
+  field: z.string().optional(),
+  location: z.string().min(1).optional(),
+  startDate: z.string().optional().transform((str) => str ? new Date(str) : undefined),
+  endDate: z.string().optional().transform((str) => str ? new Date(str) : null),
+  description: z.string().optional(),
   visible: z.boolean().optional(),
   order: z.number().optional(),
 });
 
-// GET single skill
+// GET single education
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
-    const skill = await prisma.skill.findUnique({
+    const education = await prisma.education.findUnique({
       where: { id },
     });
 
-    if (!skill) {
+    if (!education) {
       return NextResponse.json(
-        { error: 'Skill not found' },
+        { error: 'Education not found' },
         { status: 404 }
       );
     }
 
-    return NextResponse.json(skill);
+    return NextResponse.json(education);
   } catch (error) {
     return NextResponse.json(
-      { error: 'Failed to fetch skill' },
+      { error: 'Failed to fetch education' },
       { status: 500 }
     );
   }
 }
 
-// UPDATE skill
+// UPDATE education
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -54,9 +56,9 @@ export async function PUT(
 
     const { id } = await params;
     const body = await request.json();
-    const data = skillSchema.parse(body);
+    const data = educationSchema.parse(body);
 
-    const skill = await prisma.skill.update({
+    const education = await prisma.education.update({
       where: { id },
       data,
     });
@@ -66,9 +68,9 @@ export async function PUT(
       data: {
         userId: session.user.id,
         action: 'UPDATE',
-        entity: 'Skill',
-        entityId: skill.id,
-        newValue: skill as any,
+        entity: 'Education',
+        entityId: education.id,
+        newValue: education as any,
       },
     });
 
@@ -76,7 +78,7 @@ export async function PUT(
     revalidatePath('/');
     revalidatePath('/about');
 
-    return NextResponse.json(skill);
+    return NextResponse.json(education);
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -85,13 +87,13 @@ export async function PUT(
       );
     }
     return NextResponse.json(
-      { error: 'Failed to update skill' },
+      { error: 'Failed to update education' },
       { status: 500 }
     );
   }
 }
 
-// DELETE skill
+// DELETE education
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -104,7 +106,7 @@ export async function DELETE(
 
     const { id } = await params;
 
-    await prisma.skill.delete({
+    await prisma.education.delete({
       where: { id },
     });
 
@@ -113,7 +115,7 @@ export async function DELETE(
       data: {
         userId: session.user.id,
         action: 'DELETE',
-        entity: 'Skill',
+        entity: 'Education',
         entityId: id,
       },
     });
@@ -125,7 +127,7 @@ export async function DELETE(
     return NextResponse.json({ success: true });
   } catch (error) {
     return NextResponse.json(
-      { error: 'Failed to delete skill' },
+      { error: 'Failed to delete education' },
       { status: 500 }
     );
   }

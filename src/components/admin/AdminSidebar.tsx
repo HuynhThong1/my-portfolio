@@ -6,6 +6,7 @@ import {
   LayoutDashboard,
   FileText,
   Briefcase,
+  GraduationCap,
   Code2,
   Settings,
   MessageSquare,
@@ -22,6 +23,7 @@ const menuItems = [
   { href: '/admin/builder', label: 'Page Builder', icon: Palette },
   { href: '/admin/projects', label: 'Projects', icon: FileText },
   { href: '/admin/experience', label: 'Experience', icon: Briefcase },
+  { href: '/admin/education', label: 'Education', icon: GraduationCap },
   { href: '/admin/skills', label: 'Skills', icon: Code2 },
   { href: '/admin/messages', label: 'Messages', icon: MessageSquare },
 ];

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -18,13 +18,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { Plus, Pencil, Trash2, Code } from 'lucide-react';
+import { Plus, Pencil, Trash2, Code, Upload, X, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface Skill {
   id: string;
   name: string;
   icon?: string;
+  imageUrl?: string;
   category: string;
   proficiency: number;
   order: number;
@@ -223,7 +224,14 @@ export default function SkillsPage() {
                           style={{ width: `${skill.proficiency}%` }}
                         />
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        {skill.imageUrl && (
+                          <img
+                            src={skill.imageUrl}
+                            alt={skill.name}
+                            className="w-6 h-6 object-contain"
+                          />
+                        )}
                         {skill.icon && (
                           <Badge variant="outline">{skill.icon}</Badge>
                         )}
@@ -262,14 +270,84 @@ function SkillForm({
   onSave: (skill: Partial<Skill>) => void;
   onCancel: () => void;
 }) {
+  const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
   const [formData, setFormData] = useState({
     name: skill?.name || '',
     icon: skill?.icon || '',
+    imageUrl: skill?.imageUrl || '',
     category: skill?.category || '',
     proficiency: skill?.proficiency || 50,
     visible: skill?.visible ?? true,
     order: skill?.order || 0,
   });
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
+    if (!allowedTypes.includes(file.type)) {
+      toast({
+        title: 'Invalid file type',
+        description: 'Please upload a JPEG, PNG, GIF, WebP, or SVG image',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // Validate file size (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: 'File too large',
+        description: 'Maximum file size is 5MB',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const uploadData = new FormData();
+      uploadData.append('file', file);
+      uploadData.append('folder', 'skills');
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: uploadData,
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Upload failed');
+      }
+
+      const result = await response.json();
+      setFormData({ ...formData, imageUrl: result.url });
+      toast({
+        title: 'Image uploaded',
+        description: 'Your skill icon has been uploaded successfully',
+      });
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast({
+        title: 'Upload failed',
+        description: error instanceof Error ? error.message : 'Failed to upload image',
+        variant: 'destructive',
+      });
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setFormData({ ...formData, imageUrl: '' });
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -277,6 +355,7 @@ function SkillForm({
       ...skill,
       name: formData.name,
       icon: formData.icon || undefined,
+      imageUrl: formData.imageUrl || undefined,
       category: formData.category,
       proficiency: formData.proficiency,
       visible: formData.visible,
@@ -309,13 +388,79 @@ function SkillForm({
       </div>
 
       <div>
-        <Label htmlFor="icon">Icon/Emoji (optional)</Label>
+        <Label>Skill Icon</Label>
+        <div className="mt-2 space-y-3">
+          {/* Image Preview */}
+          {formData.imageUrl ? (
+            <div className="relative inline-block">
+              <img
+                src={formData.imageUrl}
+                alt="Skill icon preview"
+                className="w-16 h-16 object-contain border rounded-lg p-2 bg-zinc-50 dark:bg-zinc-900"
+              />
+              <button
+                type="button"
+                onClick={handleRemoveImage}
+                className="absolute -top-2 -right-2 p-1 bg-destructive text-destructive-foreground rounded-full hover:bg-destructive/90"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </div>
+          ) : (
+            <div className="w-16 h-16 border-2 border-dashed rounded-lg flex items-center justify-center bg-zinc-50 dark:bg-zinc-900">
+              <Upload className="h-6 w-6 text-muted-foreground" />
+            </div>
+          )}
+
+          {/* Upload Button */}
+          <div className="flex gap-2">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml"
+              onChange={handleImageUpload}
+              className="hidden"
+              id="skill-image-upload"
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+            >
+              {uploading ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Uploading...
+                </>
+              ) : (
+                <>
+                  <Upload className="h-4 w-4 mr-2" />
+                  Upload Image
+                </>
+              )}
+            </Button>
+          </div>
+
+          <p className="text-xs text-muted-foreground">
+            Recommended: SVG or PNG with transparent background. Max 5MB.
+          </p>
+        </div>
+      </div>
+
+      <div>
+        <Label htmlFor="icon">Fallback Emoji (optional)</Label>
         <Input
           id="icon"
           value={formData.icon}
           onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-          placeholder="⚛️ or icon name"
+          placeholder="⚛️"
+          className="max-w-[100px]"
         />
+        <p className="text-xs text-muted-foreground mt-1">
+          Used when no image is uploaded
+        </p>
       </div>
 
       <div>
@@ -354,7 +499,7 @@ function SkillForm({
         <Button type="button" variant="outline" onClick={onCancel}>
           Cancel
         </Button>
-        <Button type="submit">
+        <Button type="submit" disabled={uploading}>
           {skill ? 'Update' : 'Create'} Skill
         </Button>
       </DialogFooter>
