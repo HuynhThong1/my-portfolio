@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Menu, X, Github, Linkedin, Mail, Moon, Sun } from 'lucide-react';
+import { Menu, X, Github, Linkedin, Moon, Sun, Sparkles } from 'lucide-react';
 
 interface NavItem {
   label: string;
@@ -42,7 +42,6 @@ export function Header({
 
   useEffect(() => {
     setMounted(true);
-    // Sync theme state with DOM after mount
     const isDarkMode = document.documentElement.classList.contains('dark') ||
       localStorage.getItem('theme') === 'dark';
     setIsDark(isDarkMode);
@@ -63,73 +62,109 @@ export function Header({
     localStorage.setItem('theme', newIsDark ? 'dark' : 'light');
   };
 
-  const headerBg = scrolled || !transparent
-    ? 'bg-background/80 backdrop-blur-lg border-b border-border/50 shadow-sm'
-    : 'bg-transparent';
-
   return (
     <header
-      className={`${sticky ? 'fixed' : 'absolute'} top-0 left-0 right-0 z-50 transition-all duration-300 ${headerBg}`}
+      className={`${sticky ? 'fixed' : 'absolute'} top-4 left-4 right-4 z-50 transition-all duration-500`}
     >
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16 md:h-20">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
+      {/* Centered Floating Navbar */}
+      <motion.div
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.5, ease: 'easeOut' }}
+        className="max-w-4xl mx-auto"
+      >
+        <nav
+          className={`
+            flex items-center justify-between gap-2 px-3 py-2 rounded-2xl
+            transition-all duration-300
+            ${scrolled || !transparent
+              ? 'bg-background/80 backdrop-blur-xl border border-border/50 shadow-lg shadow-primary/5'
+              : 'bg-background/40 backdrop-blur-md border border-border/30'
+            }
+          `}
+        >
+          {/* Logo - Left */}
+          <Link href="/" className="flex items-center gap-2 px-2 shrink-0">
             <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="text-xl md:text-2xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent"
+              whileHover={{ scale: 1.05 }}
+              className="flex items-center gap-2"
             >
-              Portfolio
+              <div className="relative">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary via-accent to-secondary flex items-center justify-center">
+                  <span className="text-primary-foreground font-bold text-sm">T</span>
+                </div>
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+                  className="absolute -inset-1 rounded-xl bg-gradient-to-r from-primary/20 via-accent/20 to-secondary/20 -z-10 blur-sm"
+                />
+              </div>
             </motion.div>
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-1">
+          {/* Desktop Navigation - Center */}
+          <div className="hidden md:flex items-center gap-1 bg-muted/50 rounded-xl px-1 py-1">
             {navItems.map((item, index) => (
               <motion.div
                 key={item.href}
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
+                transition={{ delay: index * 0.05 }}
               >
                 <Link
                   href={item.href}
-                  className="relative px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors group"
+                  className="relative px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-all duration-200 rounded-lg hover:bg-background/80 group"
                 >
                   {item.label}
-                  <span className="absolute inset-x-0 -bottom-px h-px bg-gradient-to-r from-primary/0 via-primary/70 to-primary/0 scale-x-0 group-hover:scale-x-100 transition-transform duration-300" />
+                  <motion.span
+                    className="absolute inset-x-2 -bottom-0 h-0.5 bg-gradient-to-r from-primary via-accent to-secondary rounded-full origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"
+                  />
                 </Link>
               </motion.div>
             ))}
-          </nav>
+          </div>
 
-          {/* Desktop Actions */}
-          <div className="hidden md:flex items-center gap-2">
+          {/* Desktop Actions - Right */}
+          <div className="hidden md:flex items-center gap-1 shrink-0">
             {social?.github && (
-              <Button variant="ghost" size="icon" asChild>
+              <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-muted" asChild>
                 <Link href={social.github} target="_blank" rel="noopener noreferrer">
-                  <Github className="h-5 w-5" />
+                  <Github className="h-4 w-4" />
                   <span className="sr-only">GitHub</span>
                 </Link>
               </Button>
             )}
             {social?.linkedin && (
-              <Button variant="ghost" size="icon" asChild>
+              <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-muted" asChild>
                 <Link href={social.linkedin} target="_blank" rel="noopener noreferrer">
-                  <Linkedin className="h-5 w-5" />
+                  <Linkedin className="h-4 w-4" />
                   <span className="sr-only">LinkedIn</span>
                 </Link>
               </Button>
             )}
-            <Button variant="ghost" size="icon" onClick={toggleTheme}>
-              {mounted && isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-9 w-9 rounded-xl hover:bg-muted"
+              onClick={toggleTheme}
+            >
+              <motion.div
+                initial={false}
+                animate={{ rotate: isDark ? 180 : 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                {mounted && isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              </motion.div>
               <span className="sr-only">Toggle theme</span>
             </Button>
-            <Button asChild size="sm" className="ml-2">
-              <Link href="/contact">
-                <Mail className="h-4 w-4 mr-2" />
-                Hire Me
+            <Button
+              asChild
+              size="sm"
+              className="ml-1 rounded-xl bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground shadow-md shadow-primary/20 transition-all duration-300 hover:shadow-lg hover:shadow-primary/30"
+            >
+              <Link href="/contact" className="flex items-center gap-2">
+                <Sparkles className="h-3.5 w-3.5" />
+                <span>Hire Me</span>
               </Link>
             </Button>
           </div>
@@ -138,60 +173,80 @@ export function Header({
           <Button
             variant="ghost"
             size="icon"
-            className="md:hidden"
+            className="md:hidden h-9 w-9 rounded-xl"
             onClick={() => setIsOpen(!isOpen)}
           >
-            {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            <motion.div
+              initial={false}
+              animate={{ rotate: isOpen ? 90 : 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </motion.div>
           </Button>
-        </div>
-      </div>
+        </nav>
 
-      {/* Mobile Menu */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-background/95 backdrop-blur-lg border-b border-border"
-          >
-            <nav className="container mx-auto px-4 py-4 flex flex-col gap-2">
-              {navItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setIsOpen(false)}
-                  className="px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-lg transition-colors"
-                >
-                  {item.label}
-                </Link>
-              ))}
-              <div className="flex items-center gap-2 pt-4 border-t border-border mt-2">
-                {social?.github && (
-                  <Button variant="ghost" size="icon" asChild>
-                    <Link href={social.github} target="_blank">
-                      <Github className="h-5 w-5" />
+        {/* Mobile Menu */}
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.95 }}
+              transition={{ duration: 0.2 }}
+              className="md:hidden mt-2 bg-background/95 backdrop-blur-xl border border-border/50 rounded-2xl shadow-xl overflow-hidden"
+            >
+              <nav className="p-3 flex flex-col gap-1">
+                {navItems.map((item, index) => (
+                  <motion.div
+                    key={item.href}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                  >
+                    <Link
+                      href={item.href}
+                      onClick={() => setIsOpen(false)}
+                      className="block px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-xl transition-all duration-200"
+                    >
+                      {item.label}
+                    </Link>
+                  </motion.div>
+                ))}
+                <div className="flex items-center gap-2 pt-3 mt-2 border-t border-border/50">
+                  {social?.github && (
+                    <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl" asChild>
+                      <Link href={social.github} target="_blank">
+                        <Github className="h-5 w-5" />
+                      </Link>
+                    </Button>
+                  )}
+                  {social?.linkedin && (
+                    <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl" asChild>
+                      <Link href={social.linkedin} target="_blank">
+                        <Linkedin className="h-5 w-5" />
+                      </Link>
+                    </Button>
+                  )}
+                  <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl" onClick={toggleTheme}>
+                    {mounted && isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+                  </Button>
+                  <Button
+                    asChild
+                    size="sm"
+                    className="ml-auto rounded-xl bg-gradient-to-r from-primary to-primary/80"
+                  >
+                    <Link href="/contact" onClick={() => setIsOpen(false)}>
+                      <Sparkles className="h-4 w-4 mr-2" />
+                      Hire Me
                     </Link>
                   </Button>
-                )}
-                {social?.linkedin && (
-                  <Button variant="ghost" size="icon" asChild>
-                    <Link href={social.linkedin} target="_blank">
-                      <Linkedin className="h-5 w-5" />
-                    </Link>
-                  </Button>
-                )}
-                <Button variant="ghost" size="icon" onClick={toggleTheme}>
-                  {mounted && isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-                </Button>
-                <Button asChild size="sm" className="ml-auto">
-                  <Link href="/contact">Hire Me</Link>
-                </Button>
-              </div>
-            </nav>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                </div>
+              </nav>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
     </header>
   );
 }

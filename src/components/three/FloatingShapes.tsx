@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useMemo } from 'react';
+import React, { useRef, useMemo, useEffect, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Float, MeshDistortMaterial } from '@react-three/drei';
 import * as THREE from 'three';
@@ -40,7 +40,7 @@ function FloatingShape({ position, color, speed = 1, distort = 0.3, size = 1 }: 
   );
 }
 
-function ParticleField() {
+function ParticleField({ isDark }: { isDark: boolean }) {
   const particlesRef = useRef<THREE.Points>(null);
   const count = 200;
 
@@ -53,13 +53,20 @@ function ParticleField() {
       positions[i * 3 + 1] = (Math.random() - 0.5) * 20;
       positions[i * 3 + 2] = (Math.random() - 0.5) * 20;
 
-      colors[i * 3] = 0.5 + Math.random() * 0.5;
-      colors[i * 3 + 1] = 0.5 + Math.random() * 0.5;
-      colors[i * 3 + 2] = 1;
+      // Use blue tones for dark mode, rose tones for light mode
+      if (isDark) {
+        colors[i * 3] = 0.2 + Math.random() * 0.3;     // R - low
+        colors[i * 3 + 1] = 0.4 + Math.random() * 0.3; // G - medium
+        colors[i * 3 + 2] = 0.8 + Math.random() * 0.2; // B - high (blue)
+      } else {
+        colors[i * 3] = 0.8 + Math.random() * 0.2;     // R - high (rose)
+        colors[i * 3 + 1] = 0.3 + Math.random() * 0.2; // G - low
+        colors[i * 3 + 2] = 0.5 + Math.random() * 0.3; // B - medium
+      }
     }
 
     return [positions, colors];
-  }, []);
+  }, [isDark]);
 
   useFrame((state) => {
     if (particlesRef.current) {
@@ -88,27 +95,54 @@ function ParticleField() {
   );
 }
 
-function Scene() {
+function Scene({ isDark }: { isDark: boolean }) {
+  // Theme-aware colors
+  // Dark mode: Blue (#3B82F6), Cyan (#06B6D4)
+  // Light mode: Rose (#F43F5E), Purple (#A855F7)
+  const primaryColor = isDark ? '#3B82F6' : '#F43F5E';
+  const secondaryColor = isDark ? '#06B6D4' : '#A855F7';
+  const accentColor = isDark ? '#1E40AF' : '#BE185D';
+
   return (
     <>
       <ambientLight intensity={0.5} />
       <directionalLight position={[10, 10, 5]} intensity={1} />
-      <pointLight position={[-10, -10, -5]} intensity={0.5} color="#8b5cf6" />
+      <pointLight position={[-10, -10, -5]} intensity={0.5} color={primaryColor} />
 
       {/* Main floating shapes */}
-      <FloatingShape position={[3, 1, -2]} color="#8b5cf6" speed={0.8} size={0.8} distort={0.4} />
-      <FloatingShape position={[-3, -1, -3]} color="#3b82f6" speed={1.2} size={0.6} distort={0.3} />
-      <FloatingShape position={[0, 2, -4]} color="#06b6d4" speed={0.6} size={0.5} distort={0.5} />
-      <FloatingShape position={[-2, 1.5, -2]} color="#8b5cf6" speed={1} size={0.4} distort={0.3} />
-      <FloatingShape position={[2, -1.5, -3]} color="#3b82f6" speed={0.9} size={0.3} distort={0.4} />
+      <FloatingShape position={[3, 1, -2]} color={primaryColor} speed={0.8} size={0.8} distort={0.4} />
+      <FloatingShape position={[-3, -1, -3]} color={secondaryColor} speed={1.2} size={0.6} distort={0.3} />
+      <FloatingShape position={[0, 2, -4]} color={secondaryColor} speed={0.6} size={0.5} distort={0.5} />
+      <FloatingShape position={[-2, 1.5, -2]} color={accentColor} speed={1} size={0.4} distort={0.3} />
+      <FloatingShape position={[2, -1.5, -3]} color={primaryColor} speed={0.9} size={0.3} distort={0.4} />
 
       {/* Particle field */}
-      <ParticleField />
+      <ParticleField isDark={isDark} />
     </>
   );
 }
 
 export function FloatingShapesBackground() {
+  const [isDark, setIsDark] = useState(true);
+
+  useEffect(() => {
+    // Check initial dark mode state
+    const checkDarkMode = () => {
+      setIsDark(document.documentElement.classList.contains('dark'));
+    };
+
+    checkDarkMode();
+
+    // Watch for theme changes
+    const observer = new MutationObserver(checkDarkMode);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <div className="absolute inset-0 -z-10">
       <Canvas
@@ -116,7 +150,7 @@ export function FloatingShapesBackground() {
         gl={{ antialias: true, alpha: true }}
         style={{ background: 'transparent' }}
       >
-        <Scene />
+        <Scene isDark={isDark} />
       </Canvas>
     </div>
   );

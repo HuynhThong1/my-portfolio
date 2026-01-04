@@ -19,7 +19,7 @@ export function ExperienceBlock({
   preview = false,
 }: ExperienceBlockProps) {
   return (
-    <section className="py-20 px-4">
+    <section id="experience" className="py-20 px-4 scroll-mt-24">
       <div className="container">
         <motion.div
           initial={preview ? false : { opacity: 0, y: 20 }}

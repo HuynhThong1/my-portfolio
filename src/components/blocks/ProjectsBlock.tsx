@@ -29,7 +29,7 @@ export function ProjectsBlock({
   const displayProjects = maxItems ? projects.slice(0, maxItems) : projects;
 
   return (
-    <section className="py-20 md:py-32 px-4">
+    <section id="projects" className="py-20 md:py-32 px-4 scroll-mt-24">
       <div className="container">
         <motion.div
           initial={preview ? false : { opacity: 0, y: 20 }}
@@ -62,7 +62,7 @@ export function ProjectsBlock({
               <Card className="h-full hover:shadow-xl transition-all duration-300 border-border/50 hover:border-primary/30 overflow-hidden bg-background/50 backdrop-blur-sm">
                 {/* Project Image */}
                 <div className="relative aspect-video bg-linear-to-br from-primary/10 to-accent/10 overflow-hidden">
-                  <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-size-[16px_16px]" />
+                  <div className="absolute inset-0 bg-[linear-gradient(to_right,var(--border)_1px,transparent_1px),linear-gradient(to_bottom,var(--border)_1px,transparent_1px)] bg-size-[16px_16px] opacity-30" />
 
                   {/* Placeholder/Featured badge */}
                   {project.featured && (

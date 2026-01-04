@@ -70,8 +70,8 @@ function renderSkillIcon(skill: { name: string; icon?: string; iconId?: string; 
 
   // Fallback to first letter
   return (
-    <div className={`${sizeClasses[size]} rounded-xl bg-gradient-to-br from-zinc-700 to-zinc-800 flex items-center justify-center`}>
-      <span className="text-xl md:text-2xl font-bold text-zinc-400">
+    <div className={`${sizeClasses[size]} rounded-xl bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center`}>
+      <span className="text-xl md:text-2xl font-bold text-muted-foreground">
         {skill.name.charAt(0)}
       </span>
     </div>
@@ -101,15 +101,15 @@ function SkillCard({
       whileHover={{ y: -8, scale: 1.02 }}
       className="group relative"
     >
-      <div className="relative flex flex-col items-center p-6 rounded-2xl bg-zinc-900/50 border border-zinc-800/50 backdrop-blur-sm hover:border-zinc-700 hover:bg-zinc-800/50 transition-all duration-500 cursor-pointer overflow-hidden">
+      <div className="relative flex flex-col items-center p-6 rounded-2xl bg-card/50 border border-border/50 backdrop-blur-sm hover:border-primary/30 hover:bg-card/80 transition-all duration-500 cursor-pointer overflow-hidden">
         {/* Gradient glow on hover */}
         <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-          <div className="absolute inset-0 bg-gradient-to-br from-violet-500/10 via-transparent to-blue-500/10" />
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent/10" />
         </div>
 
         {/* Animated border gradient */}
         <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-          <div className="absolute inset-[-1px] rounded-2xl bg-gradient-to-r from-violet-500/20 via-blue-500/20 to-violet-500/20 blur-sm" />
+          <div className="absolute inset-[-1px] rounded-2xl bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20 blur-sm" />
         </div>
 
         {/* Icon container */}
@@ -118,19 +118,19 @@ function SkillCard({
           whileHover={{ rotate: [0, -5, 5, 0] }}
           transition={{ duration: 0.4 }}
         >
-          <div className="grayscale-[20%] group-hover:grayscale-0 transition-all duration-500 group-hover:drop-shadow-[0_0_12px_rgba(139,92,246,0.4)]">
+          <div className="grayscale-[20%] group-hover:grayscale-0 transition-all duration-500 group-hover:drop-shadow-[0_0_12px_var(--glow-primary)]">
             {renderSkillIcon(skill, 'lg')}
           </div>
         </motion.div>
 
         {/* Skill name */}
-        <span className="relative z-10 text-sm md:text-base font-medium text-zinc-400 group-hover:text-white transition-colors duration-300 text-center">
+        <span className="relative z-10 text-sm md:text-base font-medium text-muted-foreground group-hover:text-foreground transition-colors duration-300 text-center">
           {skill.name}
         </span>
 
         {/* Subtle shine effect on hover */}
         <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
-          <div className="absolute top-0 -left-full w-full h-full bg-gradient-to-r from-transparent via-white/5 to-transparent group-hover:left-full transition-all duration-1000 ease-in-out" />
+          <div className="absolute top-0 -left-full w-full h-full bg-gradient-to-r from-transparent via-foreground/5 to-transparent group-hover:left-full transition-all duration-1000 ease-in-out" />
         </div>
       </div>
     </motion.div>
@@ -169,12 +169,12 @@ function MarqueeRow({
           <motion.div
             key={`${skill.name}-${index}`}
             whileHover={{ scale: 1.1, y: -4 }}
-            className="flex-shrink-0 flex items-center gap-3 px-5 py-3 rounded-full bg-zinc-900/80 border border-zinc-800 hover:border-violet-500/50 hover:bg-zinc-800/80 transition-all duration-300 cursor-pointer group/item"
+            className="flex-shrink-0 flex items-center gap-3 px-5 py-3 rounded-full bg-card/80 border border-border hover:border-primary/50 hover:bg-card transition-all duration-300 cursor-pointer group/item"
           >
             <div className="grayscale-[30%] group-hover/item:grayscale-0 transition-all duration-300">
               {renderSkillIcon(skill, 'sm')}
             </div>
-            <span className="text-sm font-medium text-zinc-400 group-hover/item:text-white transition-colors whitespace-nowrap">
+            <span className="text-sm font-medium text-muted-foreground group-hover/item:text-foreground transition-colors whitespace-nowrap">
               {skill.name}
             </span>
           </motion.div>
@@ -215,15 +215,16 @@ export function SkillsBlock({
 
   return (
     <section
+      id="skills"
       ref={containerRef}
-      className="relative py-20 md:py-32 bg-zinc-950 overflow-hidden"
+      className="relative py-20 md:py-32 bg-section-dark overflow-hidden scroll-mt-24"
     >
       {/* Background gradient orbs */}
-      <div className="absolute top-1/4 -left-1/4 w-96 h-96 bg-violet-500/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-1/4 -right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-1/4 -left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-1/4 -right-1/4 w-96 h-96 bg-accent/10 rounded-full blur-3xl pointer-events-none" />
 
       {/* Grid pattern background */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-[size:60px_60px]" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,var(--border)_1px,transparent_1px),linear-gradient(to_bottom,var(--border)_1px,transparent_1px)] bg-[size:60px_60px] opacity-20" />
 
       <div className="container relative z-10 px-4">
         {/* Section header */}
@@ -235,10 +236,10 @@ export function SkillsBlock({
             initial={preview ? false : { opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-2 px-4 py-1.5 mb-6 rounded-full bg-violet-500/10 border border-violet-500/20"
+            className="inline-flex items-center gap-2 px-4 py-1.5 mb-6 rounded-full bg-primary/10 border border-primary/20"
           >
-            <div className="w-2 h-2 rounded-full bg-violet-500 animate-pulse" />
-            <span className="text-xs font-semibold text-violet-400 uppercase tracking-wider">
+            <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+            <span className="text-xs font-semibold text-primary uppercase tracking-wider">
               {title}
             </span>
           </motion.div>
@@ -247,7 +248,7 @@ export function SkillsBlock({
             initial={preview ? false : { opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4"
+            className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4"
           >
             Skills & Technologies
           </motion.h2>
@@ -256,7 +257,7 @@ export function SkillsBlock({
             initial={preview ? false : { opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-zinc-400 text-lg max-w-2xl mx-auto"
+            className="text-muted-foreground text-lg max-w-2xl mx-auto"
           >
             {subtitle}
           </motion.p>
@@ -289,10 +290,10 @@ export function SkillsBlock({
                 >
                   {/* Category label */}
                   <div className="flex items-center gap-4 mb-6">
-                    <h3 className="text-sm font-semibold text-zinc-500 uppercase tracking-wider">
+                    <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
                       {category.name}
                     </h3>
-                    <div className="flex-1 h-px bg-gradient-to-r from-zinc-800 to-transparent" />
+                    <div className="flex-1 h-px bg-gradient-to-r from-border to-transparent" />
                   </div>
 
                   {/* Skills grid */}
