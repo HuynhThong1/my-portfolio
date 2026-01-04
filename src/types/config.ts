@@ -141,7 +141,8 @@ export interface AboutConfig {
   yearsExperience: number;
   projectsCount: number;
   highlights: Array<{ icon?: string; title: string; description: string }>;
-  profileEmoji: string;
+  profileEmoji?: string | null;
+  profileImage?: string | null;
   showImage: boolean;
   showThreeBackground: boolean;
   imagePosition: 'left' | 'right';
