@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Github, Linkedin, Mail, Twitter, Heart, ArrowUp } from 'lucide-react';
@@ -22,11 +22,15 @@ export function Footer({
   social,
   showBackToTop = true,
 }: FooterProps) {
+  const [currentYear, setCurrentYear] = useState(2024);
+
+  useEffect(() => {
+    setCurrentYear(new Date().getFullYear());
+  }, []);
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
-
-  const currentYear = new Date().getFullYear();
 
   const socialLinks = [
     { icon: Github, href: social?.github, label: 'GitHub' },

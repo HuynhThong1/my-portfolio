@@ -3,39 +3,31 @@ import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 
-const projectSchema = z.object({
-  title: z.string().min(1),
-  slug: z.string().min(1),
-  description: z.string().min(1),
-  longDescription: z.string().optional(),
-  image: z.string().optional(),
-  tags: z.array(z.string()),
-  links: z.object({
-    demo: z.string().optional(),
-    github: z.string().optional(),
-  }),
-  featured: z.boolean().default(false),
-  category: z.string(),
+const skillSchema = z.object({
+  name: z.string().min(1),
+  icon: z.string().optional(),
+  category: z.string().min(1),
+  proficiency: z.number().min(0).max(100).default(0),
   visible: z.boolean().default(true),
 });
 
-// GET all projects
+// GET all skills
 export async function GET() {
   try {
-    const projects = await prisma.project.findMany({
-      orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
+    const skills = await prisma.skill.findMany({
+      orderBy: [{ order: 'asc' }, { name: 'asc' }],
     });
 
-    return NextResponse.json({ projects });
+    return NextResponse.json({ skills });
   } catch (error) {
     return NextResponse.json(
-      { error: 'Failed to fetch projects' },
+      { error: 'Failed to fetch skills' },
       { status: 500 }
     );
   }
 }
 
-// CREATE new project
+// CREATE new skill
 export async function POST(request: NextRequest) {
   try {
     const session = await auth();
@@ -44,14 +36,14 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const data = projectSchema.parse(body);
+    const data = skillSchema.parse(body);
 
     // Get max order
-    const maxOrder = await prisma.project.aggregate({
+    const maxOrder = await prisma.skill.aggregate({
       _max: { order: true },
     });
 
-    const project = await prisma.project.create({
+    const skill = await prisma.skill.create({
       data: {
         ...data,
         order: (maxOrder._max.order || 0) + 1,
@@ -63,13 +55,13 @@ export async function POST(request: NextRequest) {
       data: {
         userId: session.user.id,
         action: 'CREATE',
-        entity: 'Project',
-        entityId: project.id,
-        newValue: project as any,
+        entity: 'Skill',
+        entityId: skill.id,
+        newValue: skill as any,
       },
     });
 
-    return NextResponse.json(project, { status: 201 });
+    return NextResponse.json(skill, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -78,7 +70,7 @@ export async function POST(request: NextRequest) {
       );
     }
     return NextResponse.json(
-      { error: 'Failed to create project' },
+      { error: 'Failed to create skill' },
       { status: 500 }
     );
   }

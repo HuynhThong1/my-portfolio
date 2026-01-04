@@ -74,7 +74,7 @@ export interface SectionConfig {
 
 export interface PageSection {
   id: string;
-  type: 'hero' | 'about' | 'skills' | 'projects' | 'experience' | 'contact';
+  type: 'hero' | 'about' | 'skills' | 'projects' | 'experience' | 'contact' | 'contact-cta';
   enabled: boolean;
   order: number;
   config: Record<string, any>;

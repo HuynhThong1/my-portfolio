@@ -3,39 +3,35 @@ import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 
-const projectSchema = z.object({
-  title: z.string().min(1),
-  slug: z.string().min(1),
+const experienceSchema = z.object({
+  company: z.string().min(1),
+  position: z.string().min(1),
+  location: z.string().min(1),
+  startDate: z.string().transform((str) => new Date(str)),
+  endDate: z.string().optional().transform((str) => str ? new Date(str) : null),
+  current: z.boolean().default(false),
   description: z.string().min(1),
-  longDescription: z.string().optional(),
-  image: z.string().optional(),
-  tags: z.array(z.string()),
-  links: z.object({
-    demo: z.string().optional(),
-    github: z.string().optional(),
-  }),
-  featured: z.boolean().default(false),
-  category: z.string(),
+  technologies: z.array(z.string()),
   visible: z.boolean().default(true),
 });
 
-// GET all projects
+// GET all experience entries
 export async function GET() {
   try {
-    const projects = await prisma.project.findMany({
-      orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
+    const experiences = await prisma.experience.findMany({
+      orderBy: [{ order: 'asc' }, { startDate: 'desc' }],
     });
 
-    return NextResponse.json({ projects });
+    return NextResponse.json({ experiences });
   } catch (error) {
     return NextResponse.json(
-      { error: 'Failed to fetch projects' },
+      { error: 'Failed to fetch experiences' },
       { status: 500 }
     );
   }
 }
 
-// CREATE new project
+// CREATE new experience
 export async function POST(request: NextRequest) {
   try {
     const session = await auth();
@@ -44,14 +40,14 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const data = projectSchema.parse(body);
+    const data = experienceSchema.parse(body);
 
     // Get max order
-    const maxOrder = await prisma.project.aggregate({
+    const maxOrder = await prisma.experience.aggregate({
       _max: { order: true },
     });
 
-    const project = await prisma.project.create({
+    const experience = await prisma.experience.create({
       data: {
         ...data,
         order: (maxOrder._max.order || 0) + 1,
@@ -63,13 +59,13 @@ export async function POST(request: NextRequest) {
       data: {
         userId: session.user.id,
         action: 'CREATE',
-        entity: 'Project',
-        entityId: project.id,
-        newValue: project as any,
+        entity: 'Experience',
+        entityId: experience.id,
+        newValue: experience as any,
       },
     });
 
-    return NextResponse.json(project, { status: 201 });
+    return NextResponse.json(experience, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -78,7 +74,7 @@ export async function POST(request: NextRequest) {
       );
     }
     return NextResponse.json(
-      { error: 'Failed to create project' },
+      { error: 'Failed to create experience' },
       { status: 500 }
     );
   }

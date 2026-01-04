@@ -14,6 +14,7 @@ interface HeroBlockProps {
   ctaSecondary?: { label: string; href: string };
   showTypingEffect?: boolean;
   backgroundStyle?: 'gradient' | 'particles' | 'none';
+  stats?: Array<{ value: string; label: string }>;
   preview?: boolean;
 }
 
@@ -24,7 +25,7 @@ const floatingVariants = {
     transition: {
       duration: 6,
       repeat: Infinity,
-      ease: 'easeInOut',
+      ease: 'easeInOut' as const,
     },
   },
 };
@@ -35,7 +36,7 @@ const floatingDelayedVariants = {
     transition: {
       duration: 5,
       repeat: Infinity,
-      ease: 'easeInOut',
+      ease: 'easeInOut' as const,
     },
   },
 };
@@ -48,6 +49,11 @@ export function HeroBlock({
   ctaSecondary,
   showTypingEffect = true,
   backgroundStyle = 'gradient',
+  stats = [
+    { value: '3+', label: 'Years Experience' },
+    { value: '20+', label: 'Projects Completed' },
+    { value: '10+', label: 'Happy Clients' },
+  ],
   preview = false,
 }: HeroBlockProps) {
   return (
@@ -177,27 +183,23 @@ export function HeroBlock({
           </motion.div>
 
           {/* Stats or trust indicators */}
-          <motion.div
-            initial={preview ? false : { opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6 }}
-            className="mt-16 pt-8 border-t border-border/50"
-          >
-            <div className="flex flex-wrap justify-center gap-8 md:gap-16">
-              <div className="text-center">
-                <div className="text-2xl md:text-3xl font-bold text-foreground">3+</div>
-                <div className="text-sm text-muted-foreground">Years Experience</div>
+          {stats && stats.length > 0 && (
+            <motion.div
+              initial={preview ? false : { opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.6 }}
+              className="mt-16 pt-8 border-t border-border/50"
+            >
+              <div className="flex flex-wrap justify-center gap-8 md:gap-16">
+                {stats.map((stat, index) => (
+                  <div key={index} className="text-center">
+                    <div className="text-2xl md:text-3xl font-bold text-foreground">{stat.value}</div>
+                    <div className="text-sm text-muted-foreground">{stat.label}</div>
+                  </div>
+                ))}
               </div>
-              <div className="text-center">
-                <div className="text-2xl md:text-3xl font-bold text-foreground">20+</div>
-                <div className="text-sm text-muted-foreground">Projects Completed</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl md:text-3xl font-bold text-foreground">10+</div>
-                <div className="text-sm text-muted-foreground">Happy Clients</div>
-              </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          )}
         </motion.div>
       </div>
 

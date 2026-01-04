@@ -37,13 +37,16 @@ export function Header({
 }: HeaderProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [isDark, setIsDark] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return document.documentElement.classList.contains('dark') ||
-        localStorage.getItem('theme') === 'dark';
-    }
-    return false;
-  });
+  const [isDark, setIsDark] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    // Sync theme state with DOM after mount
+    const isDarkMode = document.documentElement.classList.contains('dark') ||
+      localStorage.getItem('theme') === 'dark';
+    setIsDark(isDarkMode);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -120,7 +123,7 @@ export function Header({
               </Button>
             )}
             <Button variant="ghost" size="icon" onClick={toggleTheme}>
-              {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+              {mounted && isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
               <span className="sr-only">Toggle theme</span>
             </Button>
             <Button asChild size="sm" className="ml-2">
@@ -179,7 +182,7 @@ export function Header({
                   </Button>
                 )}
                 <Button variant="ghost" size="icon" onClick={toggleTheme}>
-                  {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+                  {mounted && isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
                 </Button>
                 <Button asChild size="sm" className="ml-auto">
                   <Link href="/contact">Hire Me</Link>

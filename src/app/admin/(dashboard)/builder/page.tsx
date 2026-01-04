@@ -1,15 +1,17 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Canvas } from '@/components/builder/Canvas';
 import { PropertyEditor } from '@/components/builder/PropertyEditor';
 import { PageSection } from '@/types/config';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Save, Eye } from 'lucide-react';
+import { Save, Eye, RefreshCw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 export default function BuilderPage() {
+  const router = useRouter();
   const [selectedPage, setSelectedPage] = useState<string>('home');
   const [sections, setSections] = useState<PageSection[]>([]);
   const [selectedSection, setSelectedSection] = useState<PageSection | null>(null);
@@ -53,8 +55,10 @@ export default function BuilderPage() {
       if (response.ok) {
         toast({
           title: 'Success',
-          description: 'Page layout saved successfully',
+          description: 'Page layout saved successfully. Refresh your portfolio to see changes.',
         });
+        // Refresh the router cache
+        router.refresh();
       } else {
         throw new Error('Failed to save');
       }
@@ -108,6 +112,10 @@ export default function BuilderPage() {
           <Button variant="outline" onClick={handlePreview}>
             <Eye className="h-4 w-4 mr-2" />
             Preview
+          </Button>
+          <Button variant="outline" onClick={() => router.refresh()}>
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Refresh
           </Button>
           <Button onClick={saveLayout}>
             <Save className="h-4 w-4 mr-2" />

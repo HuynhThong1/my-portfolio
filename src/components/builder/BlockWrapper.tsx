@@ -91,7 +91,7 @@ export function BlockWrapper({
           </div>
 
           <div className="text-sm text-muted-foreground">
-            {section.config.headline || section.config.title || 'No title'}
+            {section.config?.headline || section.config?.title || 'No title'}
           </div>
         </div>
       </div>

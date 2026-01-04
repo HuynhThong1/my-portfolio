@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Code2, Palette, Zap, Users, ArrowRight, CheckCircle2 } from 'lucide-react';

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
@@ -16,7 +17,7 @@ export async function GET(
       return NextResponse.json({ sections: [] });
     }
 
-    return NextResponse.json(layout.sections);
+    return NextResponse.json({ sections: layout.sections });
   } catch (error) {
     console.error('Failed to fetch layout:', error);
     return NextResponse.json(
@@ -62,6 +63,13 @@ export async function PUT(
         newValue: { page, sectionsCount: sections.length },
       },
     });
+
+    // Revalidate the page cache so changes appear immediately
+    revalidatePath('/');
+    revalidatePath(`/${page}`);
+    if (page === 'home') {
+      revalidatePath('/');
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {

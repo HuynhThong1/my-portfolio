@@ -40,9 +40,16 @@ export const getConfig = cache(async (): Promise<PortfolioConfig> => {
     return acc;
   }, {} as Record<string, any>);
 
-  // Convert layouts array to object
+  // Convert layouts array to object and transform section format
   const pagesConfig = layouts.reduce((acc, layout) => {
-    acc[layout.pageName] = { sections: layout.sections as unknown as SectionConfig[] };
+    const sections = (layout.sections as any[]).map(section => ({
+      id: section.id,
+      type: section.type,
+      order: section.order,
+      visible: section.enabled ?? section.visible ?? true,
+      props: section.config ?? section.props ?? {},
+    }));
+    acc[layout.pageName] = { sections };
     return acc;
   }, {} as Record<string, { sections: SectionConfig[] }>);
 
@@ -123,7 +130,16 @@ export async function getPageSections(pageName: string): Promise<SectionConfig[]
     return [];
   }
 
-  return (layout.sections as unknown as SectionConfig[])
+  // Transform PageSection format to SectionConfig format
+  const sections = layout.sections as any[];
+  return sections
+    .map(section => ({
+      id: section.id,
+      type: section.type,
+      order: section.order,
+      visible: section.enabled ?? section.visible ?? true,
+      props: section.config ?? section.props ?? {},
+    }))
     .filter(section => section.visible)
     .sort((a, b) => a.order - b.order);
 }

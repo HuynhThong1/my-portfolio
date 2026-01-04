@@ -11,6 +11,9 @@ import { useState } from 'react';
 interface ContactBlockProps {
   title?: string;
   description?: string;
+  email?: string;
+  phone?: string;
+  location?: string;
   showMap?: boolean;
   showSocial?: boolean;
   formFields?: string[];
@@ -20,6 +23,9 @@ interface ContactBlockProps {
 export function ContactBlock({
   title = 'Get In Touch',
   description = 'Feel free to reach out for collaborations or just a friendly hello',
+  email = 'john@example.com',
+  phone = '+84 123 456 789',
+  location = 'Ho Chi Minh City, Vietnam',
   showMap = false,
   showSocial = true,
   formFields = ['name', 'email', 'subject', 'message'],
@@ -65,7 +71,7 @@ export function ContactBlock({
               </div>
               <div>
                 <p className="font-medium">Email</p>
-                <p className="text-muted-foreground">john@example.com</p>
+                <p className="text-muted-foreground">{email}</p>
               </div>
             </div>
 
@@ -75,7 +81,7 @@ export function ContactBlock({
               </div>
               <div>
                 <p className="font-medium">Phone</p>
-                <p className="text-muted-foreground">+84 123 456 789</p>
+                <p className="text-muted-foreground">{phone}</p>
               </div>
             </div>
 
@@ -85,7 +91,7 @@ export function ContactBlock({
               </div>
               <div>
                 <p className="font-medium">Location</p>
-                <p className="text-muted-foreground">Ho Chi Minh City, Vietnam</p>
+                <p className="text-muted-foreground">{location}</p>
               </div>
             </div>
           </motion.div>

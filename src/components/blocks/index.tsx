@@ -1,3 +1,4 @@
+import React from 'react';
 import { SectionConfig } from '@/types/config';
 import { HeroBlock } from './HeroBlock';
 import { AboutBlock } from './AboutBlock';
