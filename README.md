@@ -16,9 +16,10 @@ A modern, database-driven portfolio builder built with Next.js 16, featuring aut
 - Docker deployment configuration
 - Database seeding with sample data
 - Framer Motion animations
+- **Vercel Analytics & Speed Insights** (visitor tracking, custom events)
+- Drag-and-drop page layout builder
 
 🚧 **To-Do:**
-- Drag-and-drop admin builder interface
 - Full admin panel with CRUD operations
 - Additional portfolio pages
 - Image upload functionality
@@ -70,7 +71,9 @@ Visit:
 - Email: admin@example.com
 - Password: admin123
 
-## Docker Deployment
+## Deployment
+
+### Docker Deployment
 
 ```bash
 # Start with Docker Compose
@@ -80,6 +83,26 @@ docker-compose up -d
 docker-compose logs -f portfolio
 ```
 
+### Vercel Deployment (Free Plan)
+
+For detailed Vercel deployment instructions, see [VERCEL_DEPLOYMENT.md](./VERCEL_DEPLOYMENT.md)
+
+**Quick Deploy:**
+
+1. Push your code to GitHub
+2. Import project to Vercel
+3. Add Vercel Postgres database
+4. Set environment variables (DATABASE_URL, NEXTAUTH_SECRET, NEXTAUTH_URL)
+5. Deploy!
+
+**Free Plan Includes:**
+- Unlimited websites
+- 100GB bandwidth/month
+- Free PostgreSQL database (0.5GB)
+- Automatic HTTPS & CDN
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fyour-username%2Fmy-portfolio)
+
 ## Tech Stack
 
 - **Framework:** Next.js 16
@@ -87,6 +110,7 @@ docker-compose logs -f portfolio
 - **Auth:** NextAuth.js v5
 - **UI:** Tailwind CSS v4 + shadcn/ui
 - **Animations:** Framer Motion
+- **Analytics:** Vercel Analytics + Speed Insights
 - **Package Manager:** pnpm
 
 ## Development
@@ -106,6 +130,19 @@ pnpm prisma generate         # Generate Prisma client
 pnpm prisma db seed          # Seed database
 pnpm prisma studio           # Open Prisma Studio
 ```
+
+## Analytics
+
+Track visitor behavior and website performance with built-in Vercel Analytics.
+
+**Features:**
+- Page view tracking (automatic)
+- Custom event tracking (project clicks, form submissions, etc.)
+- Speed Insights (performance metrics)
+- Real-time visitor data
+- No cookies (GDPR compliant)
+
+See [ANALYTICS.md](./ANALYTICS.md) for detailed usage and integration examples.
 
 ## License
 
