@@ -4,16 +4,18 @@ const nextConfig: NextConfig = {
   // Use standalone for Docker, remove for Vercel
   // output: process.env.DOCKER_BUILD ? 'standalone' : undefined,
   images: {
-    domains: ['localhost'],
     remotePatterns: [
       {
         protocol: 'https',
         hostname: '**',
       },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+      },
     ],
   },
   // Optimize for Vercel free plan
-  swcMinify: true,
   compress: true,
   poweredByHeader: false,
 };
