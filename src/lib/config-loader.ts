@@ -131,6 +131,7 @@ export const getConfig = cache(async (): Promise<PortfolioConfig> => {
         projectsCount: aboutSection.projectsCount,
         highlights: aboutSection.highlights as any,
         profileEmoji: aboutSection.profileEmoji,
+        profileImage: aboutSection.profileImage,
         showImage: aboutSection.showImage,
         showThreeBackground: aboutSection.showThreeBackground,
         imagePosition: aboutSection.imagePosition as 'left' | 'right',

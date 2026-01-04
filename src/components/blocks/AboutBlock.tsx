@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Code2, Palette, Zap, ArrowRight, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import dynamic from 'next/dynamic';
 
 // Dynamically import Three.js component to avoid SSR issues
@@ -35,6 +36,7 @@ interface AboutBlockProps {
   showThreeBackground?: boolean;
   imagePosition?: 'left' | 'right';
   profileEmoji?: string;
+  profileImage?: string;
   preview?: boolean;
 }
 
@@ -79,6 +81,7 @@ export function AboutBlock({
   showThreeBackground = true,
   imagePosition = 'right',
   profileEmoji = '👨‍💻',
+  profileImage,
   preview = false,
 }: AboutBlockProps) {
   return (
@@ -202,15 +205,32 @@ export function AboutBlock({
                   {/* Grid pattern */}
                   <div className="absolute inset-0 bg-[linear-gradient(to_right,var(--border)_1px,transparent_1px),linear-gradient(to_bottom,var(--border)_1px,transparent_1px)] bg-[size:24px_24px] opacity-30" />
 
-                  {/* Profile emoji/image */}
+                  {/* Profile image or emoji */}
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <motion.div
-                      animate={{ y: [0, -10, 0] }}
-                      transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-                      className="text-8xl md:text-9xl"
-                    >
-                      {profileEmoji}
-                    </motion.div>
+                    {profileImage ? (
+                      <motion.div
+                        initial={{ scale: 0.9, opacity: 0 }}
+                        whileInView={{ scale: 1, opacity: 1 }}
+                        viewport={{ once: true }}
+                        className="relative w-full h-full"
+                      >
+                        <Image
+                          src={profileImage}
+                          alt="Profile"
+                          fill
+                          className="object-cover"
+                          priority
+                        />
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        animate={{ y: [0, -10, 0] }}
+                        transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+                        className="text-8xl md:text-9xl"
+                      >
+                        {profileEmoji}
+                      </motion.div>
+                    )}
                   </div>
 
                   {/* Glow effect */}

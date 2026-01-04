@@ -391,7 +391,7 @@ Technical Stack:
         { icon: 'code', title: 'Enterprise Scale', description: 'Built systems with 1000+ screens' },
         { icon: 'zap', title: 'Performance', description: 'Optimized loading for 100k+ records' },
       ],
-      profileEmoji: '👨‍💻',
+      profileImage: '/images/avatar.png',
       showImage: true,
       showThreeBackground: true,
       imagePosition: 'right',

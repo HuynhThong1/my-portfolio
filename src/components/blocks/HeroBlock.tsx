@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import {
   ArrowRight,
@@ -47,7 +47,7 @@ const floatingElements = [
   { Icon: Zap, position: 'bottom-32 right-[10%]', delay: 1.5, bgClass: 'bg-accent/10 hover:bg-accent/20', borderClass: 'border-accent/20', iconClass: 'text-accent' },
 ];
 
-// Interactive card component
+// Simple card wrapper - lightweight alternative
 function InteractiveCard({
   children,
   className = '',
@@ -55,33 +55,10 @@ function InteractiveCard({
   children: React.ReactNode;
   className?: string;
 }) {
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const rotateX = useSpring(useTransform(y, [-50, 50], [10, -10]), { stiffness: 300, damping: 30 });
-  const rotateY = useSpring(useTransform(x, [-50, 50], [-10, 10]), { stiffness: 300, damping: 30 });
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    x.set(e.clientX - centerX);
-    y.set(e.clientY - centerY);
-  };
-
-  const handleMouseLeave = () => {
-    x.set(0);
-    y.set(0);
-  };
-
   return (
-    <motion.div
-      style={{ rotateX, rotateY, transformStyle: 'preserve-3d' }}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      className={`cursor-pointer ${className}`}
-    >
+    <div className={`transition-transform duration-200 hover:scale-[1.02] ${className}`}>
       {children}
-    </motion.div>
+    </div>
   );
 }
 
@@ -100,7 +77,6 @@ export function HeroBlock({
   preview = false,
 }: HeroBlockProps) {
   const [greeting, setGreeting] = useState(getGreeting());
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
@@ -109,40 +85,20 @@ export function HeroBlock({
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-    };
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
-
   const GreetingIcon = greeting.icon;
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center overflow-hidden">
       {/* Enhanced Nature-Inspired Background */}
       {backgroundStyle === 'gradient' && (
         <>
           {/* Base gradient */}
           <div className="absolute inset-0 bg-gradient-to-br from-background via-background to-muted/30" />
 
-          {/* Aurora-like gradient overlays - using CSS variables */}
-          <motion.div
-            animate={{ opacity: [0.5, 0.8, 0.5] }}
-            transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_20%_20%,var(--glow-primary),transparent_50%)]"
-          />
-          <motion.div
-            animate={{ opacity: [0.4, 0.7, 0.4] }}
-            transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_80%_80%,var(--glow-secondary),transparent_50%)]"
-          />
-          <motion.div
-            animate={{ opacity: [0.3, 0.6, 0.3] }}
-            transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_50%_50%,var(--glow-accent),transparent_40%)]"
-          />
+          {/* Static gradient overlays - no animation for better performance */}
+          <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_20%_20%,var(--glow-primary),transparent_50%)] opacity-60" />
+          <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_80%_80%,var(--glow-secondary),transparent_50%)] opacity-50" />
+          <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_50%_50%,var(--glow-accent),transparent_40%)] opacity-40" />
 
           {/* Organic mesh pattern */}
           <div
@@ -152,36 +108,13 @@ export function HeroBlock({
             }}
           />
 
-          {/* Interactive glow that follows mouse */}
-          <motion.div
-            className="absolute w-[600px] h-[600px] rounded-full pointer-events-none bg-[radial-gradient(circle,var(--glow-primary),transparent_60%)]"
-            animate={{
-              x: mousePosition.x - 300,
-              y: mousePosition.y - 300,
-            }}
-            transition={{ type: 'spring', damping: 30, stiffness: 200 }}
-          />
-
-          {/* Breathing glow orbs */}
-          <motion.div
-            animate={{ scale: [1, 1.3, 1], opacity: [0.2, 0.4, 0.2] }}
-            transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute top-1/4 left-1/4 w-80 h-80 bg-primary/15 rounded-full blur-3xl"
-          />
-          <motion.div
-            animate={{ scale: [1.3, 1, 1.3], opacity: [0.15, 0.3, 0.15] }}
-            transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/15 rounded-full blur-3xl"
-          />
-          <motion.div
-            animate={{ scale: [1.1, 1.4, 1.1], opacity: [0.1, 0.25, 0.1] }}
-            transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute top-1/2 right-1/3 w-72 h-72 bg-accent/10 rounded-full blur-3xl"
-          />
+          {/* Static glow orbs - CSS animation for GPU acceleration */}
+          <div className="absolute top-1/4 left-1/4 w-80 h-80 bg-primary/10 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/10 rounded-full blur-3xl animate-pulse [animation-delay:1s]" />
         </>
       )}
 
-      {/* Floating decorative elements */}
+      {/* Floating decorative elements - simplified animations */}
       {floatingElements.map(({ Icon, position, delay, bgClass, borderClass, iconClass }, index) => (
         <motion.div
           key={index}
@@ -190,14 +123,11 @@ export function HeroBlock({
           transition={{ delay: delay + 0.5 }}
           className={`absolute ${position} hidden lg:block`}
         >
-          <motion.div
-            animate={{ y: [-10, 10, -10], rotate: [-5, 5, -5] }}
-            transition={{ duration: 5 + index, repeat: Infinity, ease: 'easeInOut' }}
-            whileHover={{ scale: 1.2, rotate: 10 }}
-            className={`p-4 ${bgClass} rounded-2xl backdrop-blur-sm border ${borderClass} cursor-pointer transition-colors`}
+          <div
+            className={`p-4 ${bgClass} rounded-2xl backdrop-blur-sm border ${borderClass} cursor-pointer transition-all duration-300 hover:scale-110`}
           >
             <Icon className={`h-6 w-6 ${iconClass}`} />
-          </motion.div>
+          </div>
         </motion.div>
       ))}
 
@@ -322,12 +252,12 @@ export function HeroBlock({
                   asChild
                   variant="outline"
                   size="lg"
-                  className="group text-base px-8 h-14 rounded-2xl border-2 border-secondary/30 hover:border-secondary/50 hover:bg-secondary/5 transition-all duration-300"
+                  className="group text-base px-8 h-14 rounded-2xl border-2 border-secondary/30 hover:border-secondary/50 hover:bg-secondary/5 hover:text-primary transition-all duration-300"
                 >
-                  <Link href={ctaSecondary.href} className="flex items-center gap-3">
+                  <a href={ctaSecondary.href} download className="flex items-center gap-3">
                     <Download className="h-5 w-5 group-hover:scale-110 transition-transform" />
                     {ctaSecondary.label}
-                  </Link>
+                  </a>
                 </Button>
               </motion.div>
             )}

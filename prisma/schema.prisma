@@ -157,7 +157,8 @@ model AboutSection {
   yearsExperience  Int      @default(3)
   projectsCount    Int      @default(20)
   highlights       Json     // Array of { icon?: string, title: string, description: string }
-  profileEmoji     String   @default("👨‍💻")
+  profileEmoji     String?   @default("👨‍💻")
+  profileImage     String?  // Optional path to avatar image
   showImage        Boolean  @default(true)
   showThreeBackground Boolean @default(true)
   imagePosition    String   @default("right") // 'left' | 'right'
