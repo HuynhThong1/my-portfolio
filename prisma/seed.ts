@@ -371,7 +371,7 @@ Technical Stack:
     data: {
       sectionLabel: 'About Me',
       title: 'Frontend Engineer,',
-      titleHighlight: 'Team Leader',
+      titleHighlight: 'Proficient in Angular',
       description: [
         "I'm a Frontend Engineer with 3+ years of experience building large-scale enterprise applications. My expertise lies in Angular, with strong skills in React and Vue.js as well.",
         'I have proven leadership experience, having led a frontend team of 10 developers. I specialize in designing reusable component systems, optimizing complex user interfaces, and performance tuning for applications handling 100k+ records.',
