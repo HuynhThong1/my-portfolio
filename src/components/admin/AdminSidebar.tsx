@@ -11,6 +11,7 @@ import {
   Settings,
   MessageSquare,
   Palette,
+  User,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -21,6 +22,7 @@ interface AdminSidebarProps {
 const menuItems = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/admin/builder', label: 'Page Builder', icon: Palette },
+  { href: '/admin/about', label: 'About Section', icon: User },
   { href: '/admin/projects', label: 'Projects', icon: FileText },
   { href: '/admin/experience', label: 'Experience', icon: Briefcase },
   { href: '/admin/education', label: 'Education', icon: GraduationCap },

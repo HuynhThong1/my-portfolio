@@ -49,6 +49,8 @@ const mockConfig: PortfolioConfig = {
     projects: [],
     experience: [],
     education: [],
+    skills: [],
+    about: null,
   },
 };
 

@@ -132,12 +132,28 @@ export interface SkillCategory {
   }[];
 }
 
+export interface AboutConfig {
+  sectionLabel: string;
+  title: string;
+  titleHighlight: string;
+  description: string[];
+  skills: Array<{ name: string; icon?: string }>;
+  yearsExperience: number;
+  projectsCount: number;
+  highlights: Array<{ icon?: string; title: string; description: string }>;
+  profileEmoji: string;
+  showImage: boolean;
+  showThreeBackground: boolean;
+  imagePosition: 'left' | 'right';
+}
+
 export interface DataConfig {
   projects: Project[];
   experience: Experience[];
   education: Education[];
   certifications?: Certification[];
   skills: SkillCategory[];
+  about: AboutConfig | null;
 }
 
 export interface Certification {

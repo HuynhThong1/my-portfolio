@@ -1,10 +1,12 @@
 'use client';
 
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useRef } from 'react';
+import { motion, useInView, useScroll, useTransform } from 'framer-motion';
+import { getIconById } from '@/components/icons/TechIcons';
 
 interface SkillsBlockProps {
   title?: string;
+  subtitle?: string;
   layout?: 'grid' | 'carousel' | 'list';
   showProficiency?: boolean;
   categories?: Array<{
@@ -12,6 +14,7 @@ interface SkillsBlockProps {
     skills: Array<{
       name: string;
       icon?: string;
+      iconId?: string;
       imageUrl?: string;
       proficiency?: number;
     }>;
@@ -19,11 +22,178 @@ interface SkillsBlockProps {
   preview?: boolean;
 }
 
+// Render icon helper - checks for iconId first, then imageUrl, then emoji icon
+function renderSkillIcon(skill: { name: string; icon?: string; iconId?: string; imageUrl?: string }, size: 'sm' | 'md' | 'lg' = 'md') {
+  const sizeClasses = {
+    sm: 'w-6 h-6 md:w-7 md:h-7',
+    md: 'w-10 h-10 md:w-12 md:h-12',
+    lg: 'w-14 h-14 md:w-16 md:h-16',
+  };
+  const textSizes = {
+    sm: 'text-xl md:text-2xl',
+    md: 'text-3xl md:text-4xl',
+    lg: 'text-4xl md:text-5xl',
+  };
+
+  // Try iconId first (from our icon library)
+  if (skill.iconId) {
+    const techIcon = getIconById(skill.iconId);
+    if (techIcon) {
+      const IconComponent = techIcon.icon;
+      return (
+        <div className={`${sizeClasses[size]} flex items-center justify-center`}>
+          <IconComponent size={size === 'sm' ? 24 : size === 'md' ? 40 : 56} />
+        </div>
+      );
+    }
+  }
+
+  // Then try imageUrl
+  if (skill.imageUrl) {
+    return (
+      <img
+        src={skill.imageUrl}
+        alt={skill.name}
+        className={`${sizeClasses[size]} object-contain`}
+      />
+    );
+  }
+
+  // Then try emoji icon
+  if (skill.icon) {
+    return (
+      <span className={textSizes[size]}>
+        {skill.icon}
+      </span>
+    );
+  }
+
+  // Fallback to first letter
+  return (
+    <div className={`${sizeClasses[size]} rounded-xl bg-gradient-to-br from-zinc-700 to-zinc-800 flex items-center justify-center`}>
+      <span className="text-xl md:text-2xl font-bold text-zinc-400">
+        {skill.name.charAt(0)}
+      </span>
+    </div>
+  );
+}
+
+// Skill card component with hover effects
+function SkillCard({
+  skill,
+  index,
+  preview,
+}: {
+  skill: { name: string; icon?: string; iconId?: string; imageUrl?: string; category: string };
+  index: number;
+  preview: boolean;
+}) {
+  return (
+    <motion.div
+      initial={preview ? false : { opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-50px' }}
+      transition={{
+        duration: 0.5,
+        delay: index * 0.03,
+        ease: [0.21, 0.47, 0.32, 0.98],
+      }}
+      whileHover={{ y: -8, scale: 1.02 }}
+      className="group relative"
+    >
+      <div className="relative flex flex-col items-center p-6 rounded-2xl bg-zinc-900/50 border border-zinc-800/50 backdrop-blur-sm hover:border-zinc-700 hover:bg-zinc-800/50 transition-all duration-500 cursor-pointer overflow-hidden">
+        {/* Gradient glow on hover */}
+        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+          <div className="absolute inset-0 bg-gradient-to-br from-violet-500/10 via-transparent to-blue-500/10" />
+        </div>
+
+        {/* Animated border gradient */}
+        <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+          <div className="absolute inset-[-1px] rounded-2xl bg-gradient-to-r from-violet-500/20 via-blue-500/20 to-violet-500/20 blur-sm" />
+        </div>
+
+        {/* Icon container */}
+        <motion.div
+          className="relative z-10 flex items-center justify-center w-14 h-14 md:w-16 md:h-16 mb-4 group-hover:scale-110 transition-transform duration-300"
+          whileHover={{ rotate: [0, -5, 5, 0] }}
+          transition={{ duration: 0.4 }}
+        >
+          <div className="grayscale-[20%] group-hover:grayscale-0 transition-all duration-500 group-hover:drop-shadow-[0_0_12px_rgba(139,92,246,0.4)]">
+            {renderSkillIcon(skill, 'lg')}
+          </div>
+        </motion.div>
+
+        {/* Skill name */}
+        <span className="relative z-10 text-sm md:text-base font-medium text-zinc-400 group-hover:text-white transition-colors duration-300 text-center">
+          {skill.name}
+        </span>
+
+        {/* Subtle shine effect on hover */}
+        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
+          <div className="absolute top-0 -left-full w-full h-full bg-gradient-to-r from-transparent via-white/5 to-transparent group-hover:left-full transition-all duration-1000 ease-in-out" />
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+// Marquee row for infinite scroll effect
+function MarqueeRow({
+  skills,
+  direction = 'left',
+  speed = 30,
+}: {
+  skills: Array<{ name: string; icon?: string; iconId?: string; imageUrl?: string; category: string }>;
+  direction?: 'left' | 'right';
+  speed?: number;
+}) {
+  return (
+    <div className="relative flex overflow-hidden py-4 group/marquee">
+      <motion.div
+        className="flex gap-4 md:gap-6"
+        animate={{
+          x: direction === 'left' ? ['0%', '-50%'] : ['-50%', '0%'],
+        }}
+        transition={{
+          x: {
+            repeat: Infinity,
+            repeatType: 'loop',
+            duration: speed,
+            ease: 'linear',
+          },
+        }}
+        style={{ willChange: 'transform' }}
+      >
+        {/* Double the items for seamless loop */}
+        {[...skills, ...skills].map((skill, index) => (
+          <motion.div
+            key={`${skill.name}-${index}`}
+            whileHover={{ scale: 1.1, y: -4 }}
+            className="flex-shrink-0 flex items-center gap-3 px-5 py-3 rounded-full bg-zinc-900/80 border border-zinc-800 hover:border-violet-500/50 hover:bg-zinc-800/80 transition-all duration-300 cursor-pointer group/item"
+          >
+            <div className="grayscale-[30%] group-hover/item:grayscale-0 transition-all duration-300">
+              {renderSkillIcon(skill, 'sm')}
+            </div>
+            <span className="text-sm font-medium text-zinc-400 group-hover/item:text-white transition-colors whitespace-nowrap">
+              {skill.name}
+            </span>
+          </motion.div>
+        ))}
+      </motion.div>
+    </div>
+  );
+}
+
 export function SkillsBlock({
+  title = 'Tech Stack',
+  subtitle = 'Technologies I work with',
   categories = [],
   preview = false,
 }: SkillsBlockProps) {
-  // Flatten all skills from all categories into a single array
+  const containerRef = useRef<HTMLElement>(null);
+  const isInView = useInView(containerRef, { once: true, margin: '-100px' });
+
+  // Flatten all skills
   const allSkills = categories.flatMap((category) =>
     category.skills.map((skill) => ({
       ...skill,
@@ -31,63 +201,116 @@ export function SkillsBlock({
     }))
   );
 
+  // Split skills for marquee rows
+  const midPoint = Math.ceil(allSkills.length / 2);
+  const firstRow = allSkills.slice(0, midPoint);
+  const secondRow = allSkills.slice(midPoint);
+
+  // For parallax scroll effect on title
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ['start end', 'end start'],
+  });
+  const titleY = useTransform(scrollYProgress, [0, 1], [50, -50]);
+
   return (
-    <section className="py-16 md:py-24 px-4 bg-zinc-950 relative overflow-hidden">
-      <div className="container relative">
-        {/* Section Label */}
+    <section
+      ref={containerRef}
+      className="relative py-20 md:py-32 bg-zinc-950 overflow-hidden"
+    >
+      {/* Background gradient orbs */}
+      <div className="absolute top-1/4 -left-1/4 w-96 h-96 bg-violet-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-1/4 -right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+
+      {/* Grid pattern background */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-[size:60px_60px]" />
+
+      <div className="container relative z-10 px-4">
+        {/* Section header */}
         <motion.div
-          initial={preview ? false : { opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="mb-8"
+          style={{ y: preview ? 0 : titleY }}
+          className="text-center mb-16"
         >
-          <span className="text-xs font-medium text-zinc-500 uppercase tracking-[0.2em]">
-            STACK
-          </span>
+          <motion.div
+            initial={preview ? false : { opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6 }}
+            className="inline-flex items-center gap-2 px-4 py-1.5 mb-6 rounded-full bg-violet-500/10 border border-violet-500/20"
+          >
+            <div className="w-2 h-2 rounded-full bg-violet-500 animate-pulse" />
+            <span className="text-xs font-semibold text-violet-400 uppercase tracking-wider">
+              {title}
+            </span>
+          </motion.div>
+
+          <motion.h2
+            initial={preview ? false : { opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4"
+          >
+            Skills & Technologies
+          </motion.h2>
+
+          <motion.p
+            initial={preview ? false : { opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="text-zinc-400 text-lg max-w-2xl mx-auto"
+          >
+            {subtitle}
+          </motion.p>
         </motion.div>
 
-        {/* Skills Row */}
-        <div className="flex flex-wrap items-center gap-6 md:gap-8">
-          {allSkills.map((skill, index) => (
-            <motion.div
-              key={`${skill.category}-${skill.name}`}
-              initial={preview ? false : { opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.05 }}
-              className="group relative"
-            >
-              {/* Skill Icon/Image */}
-              <div className="flex items-center justify-center h-8 w-8 md:h-10 md:w-10 grayscale hover:grayscale-0 opacity-80 hover:opacity-100 transition-all duration-300 cursor-pointer">
-                {skill.imageUrl ? (
-                  <img
-                    src={skill.imageUrl}
-                    alt={skill.name}
-                    title={skill.name}
-                    className="w-full h-full object-contain"
-                  />
-                ) : skill.icon ? (
-                  <span className="text-2xl md:text-3xl" title={skill.name}>
-                    {skill.icon}
-                  </span>
-                ) : (
-                  <div className="w-full h-full rounded-full bg-zinc-800 flex items-center justify-center">
-                    <span className="text-sm font-bold text-zinc-400">
-                      {skill.name.charAt(0)}
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              {/* Tooltip */}
-              <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-                <span className="text-xs text-zinc-400 whitespace-nowrap">
-                  {skill.name}
-                </span>
-              </div>
-            </motion.div>
-          ))}
+        {/* Marquee section - visible on all screens */}
+        <div className="mb-16 -mx-4 md:mx-0">
+          <MarqueeRow skills={firstRow} direction="left" speed={40} />
+          {secondRow.length > 0 && (
+            <MarqueeRow skills={secondRow} direction="right" speed={35} />
+          )}
         </div>
+
+        {/* Grid section */}
+        <motion.div
+          initial={preview ? false : { opacity: 0 }}
+          animate={isInView ? { opacity: 1 } : {}}
+          transition={{ duration: 0.8, delay: 0.3 }}
+        >
+          {/* Category-based grid */}
+          {categories.length > 0 && (
+            <div className="space-y-12">
+              {categories.map((category, catIndex) => (
+                <motion.div
+                  key={category.name}
+                  initial={preview ? false : { opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: catIndex * 0.1 }}
+                >
+                  {/* Category label */}
+                  <div className="flex items-center gap-4 mb-6">
+                    <h3 className="text-sm font-semibold text-zinc-500 uppercase tracking-wider">
+                      {category.name}
+                    </h3>
+                    <div className="flex-1 h-px bg-gradient-to-r from-zinc-800 to-transparent" />
+                  </div>
+
+                  {/* Skills grid */}
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                    {category.skills.map((skill, skillIndex) => (
+                      <SkillCard
+                        key={skill.name}
+                        skill={{ ...skill, category: category.name }}
+                        index={skillIndex}
+                        preview={preview}
+                      />
+                    ))}
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </motion.div>
       </div>
     </section>
   );

@@ -36,6 +36,7 @@ export default async function HomePage() {
               projects: config.data.projects.filter((p) => p.featured),
               categories: skillCategories,
               experiences: config.data.experience,
+              about: config.data.about,
             }}
           />
         </Suspense>

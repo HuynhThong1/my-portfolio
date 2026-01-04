@@ -20,11 +20,13 @@ import {
 } from '@/components/ui/dialog';
 import { Plus, Pencil, Trash2, Code, Upload, X, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { IconPicker, IconDisplay } from '@/components/admin/IconPicker';
 
 interface Skill {
   id: string;
   name: string;
   icon?: string;
+  iconId?: string;
   imageUrl?: string;
   category: string;
   proficiency: number;
@@ -225,14 +227,17 @@ export default function SkillsPage() {
                         />
                       </div>
                       <div className="flex items-center gap-2 flex-wrap">
-                        {skill.imageUrl && (
+                        {skill.iconId && (
+                          <IconDisplay iconId={skill.iconId} size={24} />
+                        )}
+                        {!skill.iconId && skill.imageUrl && (
                           <img
                             src={skill.imageUrl}
                             alt={skill.name}
                             className="w-6 h-6 object-contain"
                           />
                         )}
-                        {skill.icon && (
+                        {!skill.iconId && !skill.imageUrl && skill.icon && (
                           <Badge variant="outline">{skill.icon}</Badge>
                         )}
                         {!skill.visible && (
@@ -276,6 +281,7 @@ function SkillForm({
   const [formData, setFormData] = useState({
     name: skill?.name || '',
     icon: skill?.icon || '',
+    iconId: skill?.iconId || '',
     imageUrl: skill?.imageUrl || '',
     category: skill?.category || '',
     proficiency: skill?.proficiency || 50,
@@ -355,6 +361,7 @@ function SkillForm({
       ...skill,
       name: formData.name,
       icon: formData.icon || undefined,
+      iconId: formData.iconId || undefined,
       imageUrl: formData.imageUrl || undefined,
       category: formData.category,
       proficiency: formData.proficiency,
@@ -388,79 +395,90 @@ function SkillForm({
       </div>
 
       <div>
-        <Label>Skill Icon</Label>
-        <div className="mt-2 space-y-3">
-          {/* Image Preview */}
-          {formData.imageUrl ? (
-            <div className="relative inline-block">
-              <img
-                src={formData.imageUrl}
-                alt="Skill icon preview"
-                className="w-16 h-16 object-contain border rounded-lg p-2 bg-zinc-50 dark:bg-zinc-900"
-              />
-              <button
-                type="button"
-                onClick={handleRemoveImage}
-                className="absolute -top-2 -right-2 p-1 bg-destructive text-destructive-foreground rounded-full hover:bg-destructive/90"
-              >
-                <X className="h-3 w-3" />
-              </button>
-            </div>
-          ) : (
-            <div className="w-16 h-16 border-2 border-dashed rounded-lg flex items-center justify-center bg-zinc-50 dark:bg-zinc-900">
-              <Upload className="h-6 w-6 text-muted-foreground" />
-            </div>
-          )}
-
-          {/* Upload Button */}
-          <div className="flex gap-2">
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml"
-              onChange={handleImageUpload}
-              className="hidden"
-              id="skill-image-upload"
-            />
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={uploading}
-            >
-              {uploading ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Uploading...
-                </>
-              ) : (
-                <>
-                  <Upload className="h-4 w-4 mr-2" />
-                  Upload Image
-                </>
-              )}
-            </Button>
-          </div>
-
-          <p className="text-xs text-muted-foreground">
-            Recommended: SVG or PNG with transparent background. Max 5MB.
-          </p>
-        </div>
+        <Label>Skill Icon (Recommended)</Label>
+        <p className="text-xs text-muted-foreground mb-2">
+          Choose from 150+ technology icons
+        </p>
+        <IconPicker
+          value={formData.iconId}
+          onChange={(iconId) => setFormData({ ...formData, iconId })}
+        />
       </div>
 
-      <div>
-        <Label htmlFor="icon">Fallback Emoji (optional)</Label>
-        <Input
-          id="icon"
-          value={formData.icon}
-          onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-          placeholder="⚛️"
-          className="max-w-[100px]"
-        />
-        <p className="text-xs text-muted-foreground mt-1">
-          Used when no image is uploaded
+      <div className="border-t pt-4">
+        <p className="text-xs text-muted-foreground mb-3">
+          Or use a custom image / emoji instead:
         </p>
+
+        <div className="space-y-3">
+          {/* Image Upload */}
+          <div>
+            <Label className="text-sm">Custom Image</Label>
+            <div className="mt-2 flex items-center gap-3">
+              {formData.imageUrl ? (
+                <div className="relative inline-block">
+                  <img
+                    src={formData.imageUrl}
+                    alt="Skill icon preview"
+                    className="w-12 h-12 object-contain border rounded-lg p-1.5 bg-zinc-50 dark:bg-zinc-900"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleRemoveImage}
+                    className="absolute -top-1.5 -right-1.5 p-0.5 bg-destructive text-destructive-foreground rounded-full hover:bg-destructive/90"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              ) : (
+                <div className="w-12 h-12 border-2 border-dashed rounded-lg flex items-center justify-center bg-zinc-50 dark:bg-zinc-900">
+                  <Upload className="h-4 w-4 text-muted-foreground" />
+                </div>
+              )}
+              <div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                  id="skill-image-upload"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                >
+                  {uploading ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Uploading...
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="h-4 w-4 mr-2" />
+                      Upload
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          {/* Emoji Fallback */}
+          <div>
+            <Label htmlFor="icon" className="text-sm">Emoji Fallback</Label>
+            <Input
+              id="icon"
+              value={formData.icon}
+              onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
+              placeholder="⚛️"
+              className="max-w-[100px] mt-1"
+            />
+          </div>
+        </div>
       </div>
 
       <div>

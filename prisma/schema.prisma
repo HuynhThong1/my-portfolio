@@ -139,11 +139,29 @@ model Skill {
   id          String  @id @default(cuid())
   name        String
   icon        String?
+  iconId      String?
   imageUrl    String?
   category    String
   proficiency Int     @default(0) // 0-100
   order       Int     @default(0)
   visible     Boolean @default(true)
+}
+
+model AboutSection {
+  id               String   @id @default(cuid())
+  sectionLabel     String   @default("About Me")
+  title            String   @default("Passionate Developer,")
+  titleHighlight   String   @default("Problem Solver")
+  description      String[] // Array of paragraphs
+  skills           Json     // Array of { name: string, icon?: string }
+  yearsExperience  Int      @default(3)
+  projectsCount    Int      @default(20)
+  highlights       Json     // Array of { icon?: string, title: string, description: string }
+  profileEmoji     String   @default("👨‍💻")
+  showImage        Boolean  @default(true)
+  showThreeBackground Boolean @default(true)
+  imagePosition    String   @default("right") // 'left' | 'right'
+  updatedAt        DateTime @updatedAt
 }
 
 model PageLayout {

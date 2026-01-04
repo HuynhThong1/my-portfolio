@@ -12,6 +12,7 @@ export const getConfig = cache(async (): Promise<PortfolioConfig> => {
     education,
     skills,
     layouts,
+    aboutSection,
   ] = await Promise.all([
     prisma.siteConfig.findMany(),
     prisma.profile.findFirst(),
@@ -32,6 +33,7 @@ export const getConfig = cache(async (): Promise<PortfolioConfig> => {
       orderBy: { order: 'asc' },
     }),
     prisma.pageLayout.findMany(),
+    prisma.aboutSection.findFirst(),
   ]);
 
   // Convert site config array to object
@@ -61,6 +63,7 @@ export const getConfig = cache(async (): Promise<PortfolioConfig> => {
     acc[skill.category].push({
       name: skill.name,
       icon: skill.icon,
+      iconId: skill.iconId,
       imageUrl: skill.imageUrl,
       proficiency: skill.proficiency,
     });
@@ -118,6 +121,20 @@ export const getConfig = cache(async (): Promise<PortfolioConfig> => {
         name,
         skills,
       })),
+      about: aboutSection ? {
+        sectionLabel: aboutSection.sectionLabel,
+        title: aboutSection.title,
+        titleHighlight: aboutSection.titleHighlight,
+        description: aboutSection.description,
+        skills: aboutSection.skills as any,
+        yearsExperience: aboutSection.yearsExperience,
+        projectsCount: aboutSection.projectsCount,
+        highlights: aboutSection.highlights as any,
+        profileEmoji: aboutSection.profileEmoji,
+        showImage: aboutSection.showImage,
+        showThreeBackground: aboutSection.showThreeBackground,
+        imagePosition: aboutSection.imagePosition as 'left' | 'right',
+      } : null,
     },
   };
 });

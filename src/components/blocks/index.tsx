@@ -36,12 +36,24 @@ export function BlockRenderer({ section, preview = false, data }: BlockRendererP
     );
   }
 
-  // Merge section props with data if available
-  const props = {
+  // Build props based on section type
+  let props: any = {
     ...section.props,
-    ...(data && { ...data }),
     preview,
   };
+
+  // Pass specific data based on section type
+  if (section.type === 'about' && data?.about) {
+    props = { ...props, ...data.about };
+  } else if (section.type === 'skills' && data?.categories) {
+    props = { ...props, categories: data.categories };
+  } else if (section.type === 'projects' || section.type === 'projects-grid') {
+    props = { ...props, projects: data?.projects };
+  } else if (section.type === 'experience') {
+    props = { ...props, experiences: data?.experiences };
+  } else if (data) {
+    props = { ...props, ...data };
+  }
 
   return <Component {...props} />;
 }
