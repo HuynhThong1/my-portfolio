@@ -48,7 +48,7 @@ export function BlockRenderer({ section, preview = false, data }: BlockRendererP
   } else if (section.type === 'skills' && data?.categories) {
     props = { ...props, categories: data.categories };
   } else if (section.type === 'projects' || section.type === 'projects-grid') {
-    props = { ...props, projects: data?.projects };
+    props = { ...props, projects: data?.projects, showViewAll: true };
   } else if (section.type === 'experience') {
     props = { ...props, experiences: data?.experiences };
   } else if (data) {

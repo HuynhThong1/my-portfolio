@@ -5,6 +5,14 @@ import { motion } from 'framer-motion';
 import { Badge } from '@/components/ui/badge';
 import { Experience } from '@/types/config';
 
+function formatDate(dateString: string): string {
+  if (!dateString || dateString.toLowerCase() === 'present') {
+    return 'present';
+  }
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+}
+
 interface ExperienceBlockProps {
   title?: string;
   layout?: 'timeline' | 'detailed' | 'list';
@@ -47,7 +55,7 @@ export function ExperienceBlock({
                 <h3 className="text-xl font-semibold">{exp.position}</h3>
                 <p className="text-muted-foreground font-medium">{exp.company}</p>
                 <p className="text-sm text-muted-foreground">
-                  {exp.location} • {exp.startDate} - {exp.endDate}
+                  {exp.location} • {formatDate(exp.startDate)} - {formatDate(exp.endDate)}
                 </p>
 
                 <div className="prose prose-sm max-w-none text-muted-foreground mt-4">
